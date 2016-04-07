@@ -1,0 +1,86 @@
+<html>
+
+<head>
+<title>Title</title>
+</head>
+
+<body>
+
+<p>This is an R HTML document. When you click the <b>Knit HTML</b> button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+
+<!--begin.rcode
+library(caret)
+library(rpart.plot)
+setwd("/Users/HimanshuBharara/Desktop/PML")  # or any directory of your choice
+training <- read.csv("pml-training.csv", na.strings = c("NA", "#DIV/0!", ""))
+testing  <- read.csv("pml-testing.csv",  na.strings = c("NA", "#DIV/0!", ""))
+str(training, list.len=15)
+table(training$classe)
+prop.table(table(training$user_name, training$classe), 1)
+prop.table(table(training$classe))
+training <- training[, 7:160]
+testing  <- testing[, 7:160]
+is_data  <- apply(!is.na(training), 2, sum) > 19621  # which is the number of observations
+training <- training[, is_data]
+testing  <- testing[, is_data]
+set.seed(3141592)
+inTrain <- createDataPartition(y=training$classe, p=0.60, list=FALSE)
+train1  <- training[inTrain,]
+train2  <- training[-inTrain,]
+dim(train1)
+dim(train2)
+nzv_cols <- nearZeroVar(train1)
+if(length(nzv_cols) > 0) {
+  train1 <- train1[, -nzv_cols]
+  train2 <- train2[, -nzv_cols]
+}
+dim(train1)
+library(randomForest)
+set.seed(3141592)
+fitModel <- randomForest(classe~., data=train1, importance=TRUE, ntree=100)
+correl = cor(train1[,c("yaw_belt","roll_belt","num_window","pitch_belt","magnet_dumbbell_z","magnet_dumbbell_y","pitch_forearm","accel_dumbbell_y","roll_arm","roll_forearm")])
+diag(correl) <- 0
+which(abs(correl)>0.75, arr.ind=TRUE)
+cor(train1$roll_belt, train1$yaw_belt)
+fitModel <- rpart(classe~., data=train1, method="class")
+prp(fitModel)
+set.seed(3141592)
+fitModel <- train(classe~roll_belt+num_window+pitch_belt+magnet_dumbbell_y+magnet_dumbbell_z+pitch_forearm+accel_dumbbell_y+roll_arm+roll_forearm,
+                  data=train1,
+                  method="rf",
+                  trControl=trainControl(method="cv",number=2),
+                  prox=TRUE,
+                  verbose=TRUE,
+                  allowParallel=TRUE)
+predictions <- predict(fitModel, newdata=train2)
+confusionMat <- confusionMatrix(predictions, train2$classe)
+confusionMat
+missClass = function(values, predicted) {
+  sum(predicted != values) / length(values)
+}
+OOS_errRate = missClass(train2$classe, predictions)
+OOS_errRate
+predictions <- predict(fitModel, newdata=testing)
+testing$classe <- predictions
+submit <- data.frame(problem_id = testing$problem_id, classe = predictions)
+write.csv(submit, file = "coursera-submission.csv", row.names = FALSE)
+answers = testing$classe
+write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_",i,".txt")
+    write.table(x[i], file=filename, quote=FALSE, row.names=FALSE, col.names=FALSE)
+  }
+}
+write_files(answers)
+end.rcode-->
+
+<p>You can also embed plots, for example:</p>
+
+<!--begin.rcode fig.width=7, fig.height=6
+varImpPlot(fitModel)
+qplot(roll_belt, magnet_dumbbell_y, colour=classe, data=train1)
+end.rcode-->
+
+</body>
+</html>
