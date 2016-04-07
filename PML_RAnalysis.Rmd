@@ -1,14 +1,19 @@
-<html>
+---
+title: "PML-RAnalysis"
+output: html_document
+---
 
-<head>
-<title>Practical Machine Learning - Predictive Assignment</title>
-</head>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-<body>
+## R Markdown
 
-<p>This is an R HTML document. When you click the <b>Knit HTML</b> button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-<!--begin.rcode
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
 library(caret)
 library(rpart.plot)
 library(randomForest)
@@ -74,14 +79,20 @@ write_files = function(x){
   }
 }
 write_files(answers)
-end.rcode-->
+```
 
-<p>You can also embed plots, for example:</p>
+## Including Plots
 
-<!--begin.rcode fig.width=7, fig.height=6
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
 varImpPlot(fitModel)
 qplot(roll_belt, magnet_dumbbell_y, colour=classe, data=train1)
-end.rcode-->
+```
 
-</body>
-</html>
+Conclusions
+This analysis employed machine learning techniques to build a Random Forest Model capable of classifying how well physical exercises are performed based on wearable-technology data. The most robust predictors were determined using Exploratory Data Analysis. The resultant model has an in-set accuracy of 99%. The analyses are  optimized. It was not possible to fully assess how well the model performed against the test data set and the results are difficult to interpret by eye.
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
